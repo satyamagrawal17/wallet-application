@@ -1,6 +1,6 @@
 package com.example.walletApplication.repository;
 
-import com.example.walletApplication.entity.User;
+import com.example.walletApplication.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

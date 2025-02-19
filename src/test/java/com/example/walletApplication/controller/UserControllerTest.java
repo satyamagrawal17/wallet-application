@@ -1,6 +1,6 @@
 package com.example.walletApplication.controller;
 
-import com.example.walletApplication.entity.User;
+import com.example.walletApplication.dto.UserDTO;
 import com.example.walletApplication.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,15 +27,14 @@ class UserControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
-    User user;
+    UserDTO user;
 
     @MockitoBean
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        user = new User("username", "password");
-        objectMapper = new ObjectMapper();
+        user = new UserDTO("username", "password");
     }
 
     @Test
@@ -77,6 +76,4 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("User does not exist"));
     }
-
-
 }

@@ -1,6 +1,6 @@
 package com.example.walletApplication.controller;
 
-import com.example.walletApplication.entity.User;
+import com.example.walletApplication.dto.UserDTO;
 import com.example.walletApplication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +14,10 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<String> register(@RequestBody UserDTO userDto) {
 
         try {
-            userService.register(user);
+            userService.register(userDto);
             return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -25,9 +25,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<String> login(@RequestBody User user) {
+    public ResponseEntity<String> login(@RequestBody UserDTO userDto) {
         try {
-            userService.login(user);
+            userService.login(userDto);
             return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

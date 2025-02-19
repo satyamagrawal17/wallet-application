@@ -1,4 +1,4 @@
-package com.example.walletApplication.entity;
+package com.example.walletApplication.model;
 
 import com.example.walletApplication.ECurrency;
 import jakarta.persistence.Embeddable;
