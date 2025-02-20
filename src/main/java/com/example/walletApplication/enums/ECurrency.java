@@ -9,9 +9,6 @@ public enum ECurrency {
         this.conversionRate = conversionRate;
     }
 
-    public double getConversionRate(){
-        return this.conversionRate;
-    }
     public double convertToINR(double amount){
         return amount * this.conversionRate;
     }
