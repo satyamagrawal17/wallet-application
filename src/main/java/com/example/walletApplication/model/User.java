@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,8 +17,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Wallet wallet;
 
     public User(String username, String password) {
         this.username = username;

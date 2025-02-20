@@ -1,6 +1,5 @@
 package com.example.walletApplication.service;
 
-import com.example.walletApplication.ECurrency;
 import com.example.walletApplication.model.User;
 import com.example.walletApplication.model.Wallet;
 import com.example.walletApplication.repository.UserRepository;
@@ -29,9 +28,9 @@ public class UserService {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        User savedUser = userRepository.save(user);
         Wallet wallet = new Wallet();
-        user.setWallet(wallet);
-        userRepository.save(user);
+        wallet.setUser(savedUser);
     }
 
     public void login(UserDTO userDto) {
