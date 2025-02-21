@@ -31,6 +31,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         Wallet wallet = new Wallet();
         wallet.setUser(savedUser);
+
     }
 
     public void login(UserDTO userDto) {

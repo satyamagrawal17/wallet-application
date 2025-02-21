@@ -1,5 +1,6 @@
 package com.example.walletApplication.dto;
 
+import com.example.walletApplication.enums.ECurrency;
 import com.example.walletApplication.enums.ETransactionType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,11 +16,11 @@ public class TransactionRequest {
     @NotBlank(message = "Transaction type is mandatory")
     @Enumerated(EnumType.STRING)
     private ETransactionType transactionType;
-    @NotNull
-    @NotBlank(message = "Origin wallet id is mandatory")
-    private String originWalletId;
-    private String toWalletId;
+    private Long recipientWalletId;
     @NotNull
     @NotBlank(message = "Amount is mandatory")
     private double amount;
+    @NotNull
+    @NotBlank(message = "Currency is mandatory")
+    private ECurrency currency;
 }
