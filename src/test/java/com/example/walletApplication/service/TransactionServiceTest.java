@@ -70,13 +70,15 @@ class TransactionServiceTest {
     }
 
     @Test
-    void testCreateTransactionSuccessfully() throws Exception {
+    void testCreateTransactionWithDepositSuccessfully() throws Exception {
+        transactionRequest.setRecipientWalletId(null);
         when(walletService.getWallet(1L)).thenReturn(originWallet);
-        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
+//        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
         when(transactionHandlerRegistry.getHandler(ETransactionType.DEPOSIT)).thenReturn(transactionHandler);
 
         assertDoesNotThrow(() -> transactionService.createTransaction(transactionRequest, 1L, 1L));
-
+        verify(walletService, times(1)).getWallet(1L);
+        verify(walletService, never()).getWallet(2L);
         verify(transactionHandler, times(1)).process(transactionRequest, 1L);
         verify(transactionRepository, times(1)).save(any(Transaction.class));
         verify(transferRepository, never()).save(any(Transfer.class));
@@ -87,6 +89,31 @@ class TransactionServiceTest {
         when(walletService.getWallet(1L)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 1L, 1L));
+
+        verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
+    }
+
+    @Test
+    void testCreateTransactionWithInvalidRecipientWalletId() throws Exception {
+        transactionRequest.setTransactionType(ETransactionType.TRANSFER);
+        when(walletService.getWallet(1L)).thenReturn(originWallet);
+        when(walletService.getWallet(2L)).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 1L, 1L));
+
+        verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
+    }
+
+    @Test
+    void testCreateTransactionWithInvalidUser() throws Exception {
+        when(walletService.getWallet(1L)).thenReturn(originWallet);
+        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
+
+        assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 2L, 1L));
 
         verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
         verify(transactionRepository, never()).save(any(Transaction.class));
@@ -106,4 +133,21 @@ class TransactionServiceTest {
         verify(transactionRepository, times(1)).save(any(Transaction.class));
         verify(transferRepository, times(1)).save(any(Transfer.class));
     }
+
+    @Test
+    void testCreateTransactionWithWithdrawSuccessfully() throws Exception {
+        transactionRequest.setRecipientWalletId(null);
+        transactionRequest.setTransactionType(ETransactionType.WITHDRAW);
+        when(walletService.getWallet(1L)).thenReturn(originWallet);
+        when(transactionHandlerRegistry.getHandler(ETransactionType.WITHDRAW)).thenReturn(transactionHandler);
+
+        assertDoesNotThrow(() -> transactionService.createTransaction(transactionRequest, 1L, 1L));
+
+        verify(walletService, times(1)).getWallet(1L);
+        verify(walletService, never()).getWallet(2L);
+        verify(transactionHandler, times(1)).process(transactionRequest, 1L);
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
+        verify(transferRepository, never()).save(any(Transfer.class));
+    }
+
 }
