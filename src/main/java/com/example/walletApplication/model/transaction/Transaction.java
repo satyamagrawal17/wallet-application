@@ -18,8 +18,8 @@ public class Transaction {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "source_wallet_id", nullable = false)
-    private Wallet sourceWallet;
+    @JoinColumn(name = "origin_wallet_id", nullable = false)
+    private Wallet originWallet;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false)

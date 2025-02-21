@@ -2,6 +2,8 @@ package com.example.walletApplication.model;
 
 import com.example.walletApplication.enums.ECurrency;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,4 +28,14 @@ public class Wallet {
     }
 
 
+    public void addBalance(@NotNull @NotBlank(message = "Amount is mandatory") double amount) {
+        this.balance.setAmount(this.balance.getAmount() + amount);
+    }
+
+    public void subtractBalance(@NotNull @NotBlank(message = "Amount is mandatory") double amount) {
+            if(this.balance.getAmount() < amount) {
+                throw new IllegalArgumentException("Insufficient balance");
+            }
+            this.balance.setAmount(this.balance.getAmount() - amount);
+    }
 }
