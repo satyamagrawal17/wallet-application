@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.walletApplication.dto.UserDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Optional;
@@ -19,8 +20,12 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private WalletService walletService;
 
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Transactional
     public void register(UserDTO userDto) {
         Optional<User> existingUser = userRepository.findByUsername(userDto.getUsername());
         if (existingUser.isPresent()) {
@@ -30,9 +35,7 @@ public class UserService {
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User savedUser = userRepository.save(user);
-        Wallet wallet = new Wallet();
-        wallet.setUser(savedUser);
-
+        walletService.createWallet(savedUser);
     }
 
     public void login(UserDTO userDto) {

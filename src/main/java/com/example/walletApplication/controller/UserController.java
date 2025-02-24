@@ -8,12 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+//@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
+    @PostMapping("/users")
     public ResponseEntity<String> register(@RequestBody UserDTO userDto) {
 
         try {
@@ -24,7 +24,7 @@ public class UserController {
         }
     }
 
-    @GetMapping
+    @PostMapping("/sessions")
     public ResponseEntity<String> login(@RequestBody UserDTO userDto) {
         try {
             userService.login(userDto);

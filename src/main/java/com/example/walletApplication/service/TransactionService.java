@@ -14,6 +14,7 @@ import com.example.walletApplication.repository.TransferRepository;
 import com.example.walletApplication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -35,40 +36,20 @@ public class TransactionService {
     @Autowired
     private TransactionHandlerRegistry transactionHandlerRegistry;
 
-
+    @Transactional
     public void createTransaction(TransactionRequest transactionRequest, Long userId, Long originWalletId) throws Exception {
-        Wallet savedOriginWallet = walletService.getWallet(originWalletId);
-        if (savedOriginWallet == null) {
-            throw new IllegalArgumentException("Invalid origin wallet ID");
-        }
-
-        Wallet savedRecipientWallet = null;
-        if (transactionRequest.getRecipientWalletId() != null) {
-            savedRecipientWallet = walletService.getWallet(transactionRequest.getRecipientWalletId());
-            if (savedRecipientWallet == null) {
-                throw new IllegalArgumentException("Invalid recipient wallet ID");
-            }
-        }
-        if(!Objects.equals(savedOriginWallet.getUser().getId(), userId)) {
+        if(!walletService.doesUserBelongTo(originWalletId, userId)) {
             throw new IllegalArgumentException("Wallet does not belong to user");
         }
-        if(transactionRequest.getAmount() <= 0) {
-            throw new IllegalArgumentException("Amount should be greater than 0");
-        }
+        Wallet savedOriginWallet = walletService.getWallet(originWalletId);
+
+        Transaction newTransaction = new Transaction(transactionRequest, savedOriginWallet);
+        Transaction savedTransaction = transactionRepository.save(newTransaction);
         ITransactionHandler handler = transactionHandlerRegistry.getHandler(transactionRequest.getTransactionType());
-        handler.process(transactionRequest, originWalletId);
-        Transaction newTransaction = new Transaction();
-        newTransaction.setOriginWallet(savedOriginWallet);
-        newTransaction.setTransactionType(transactionRequest.getTransactionType());
-        newTransaction.setAmount(transactionRequest.getAmount());
-        transactionRepository.save(newTransaction);
-        if(transactionRequest.getTransactionType() == ETransactionType.TRANSFER) {
-            Transfer newTransfer = new Transfer();
-            newTransfer.setTransaction(newTransaction);
-            savedRecipientWallet = walletService.getWallet(transactionRequest.getRecipientWalletId());
-            newTransfer.setToWallet(savedRecipientWallet);
-            transferRepository.save(newTransfer);
+        if(Objects.isNull(handler)) {
+            throw new IllegalArgumentException("Invalid transaction type");
         }
+        handler.process(transactionRequest, originWalletId, savedTransaction);
 
     }
 }

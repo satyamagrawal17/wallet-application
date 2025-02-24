@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/**", ("/health")).permitAll()
+                        .requestMatchers("/users/**", ("/health"), "/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Permit access to H2 console
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated()

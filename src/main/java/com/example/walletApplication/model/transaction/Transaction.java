@@ -1,5 +1,6 @@
 package com.example.walletApplication.model.transaction;
 
+import com.example.walletApplication.dto.TransactionRequest;
 import com.example.walletApplication.enums.ETransactionType;
 import com.example.walletApplication.model.Wallet;
 import jakarta.persistence.*;
@@ -26,12 +27,20 @@ public class Transaction {
     private Date createdAt = new Date();
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "transaction_type", nullable = false)
     private ETransactionType transactionType;
 
     @Column(nullable = false)
     private double amount;
 
 
+    public Transaction(TransactionRequest transactionRequest, Wallet originWallet) {
+        if(transactionRequest.getAmount() < 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        this.originWallet = originWallet;
+        this.transactionType = transactionRequest.getTransactionType();
+        this.amount = transactionRequest.getAmount();
 
+    }
 }

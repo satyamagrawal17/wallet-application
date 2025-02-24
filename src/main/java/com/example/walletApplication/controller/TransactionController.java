@@ -22,7 +22,7 @@ public class TransactionController {
     public ResponseEntity<?> createTransaction(@PathVariable Long userId, @PathVariable(name = "walletId") Long originWalletId, @RequestBody TransactionRequest transactionRequest) {
         try {
             transactionService.createTransaction(transactionRequest, userId, originWalletId);
-            return new ResponseEntity<>("Transaction created successfully", HttpStatus.OK);
+            return new ResponseEntity<>(transactionRequest.getTransactionType() + " Transaction created successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

@@ -14,6 +14,7 @@ import com.example.walletApplication.repository.TransferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -47,6 +48,7 @@ class TransactionServiceTest {
     private Wallet originWallet;
     private Wallet recipientWallet;
     private ITransactionHandler transactionHandler;
+    private ArgumentCaptor<Transaction> transactionCaptor;
 
     @BeforeEach
     void setUp() {
@@ -67,87 +69,65 @@ class TransactionServiceTest {
         recipientWallet.getUser().setId(2L);
 
         transactionHandler = mock(ITransactionHandler.class);
+        transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
     }
 
     @Test
     void testCreateTransactionWithDepositSuccessfully() throws Exception {
         transactionRequest.setRecipientWalletId(null);
+        when(walletService.doesUserBelongTo(1L, 1L)).thenReturn(true);
         when(walletService.getWallet(1L)).thenReturn(originWallet);
-//        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
-        when(transactionHandlerRegistry.getHandler(ETransactionType.DEPOSIT)).thenReturn(transactionHandler);
+        when(transactionHandlerRegistry.getHandler(transactionRequest.getTransactionType())).thenReturn(transactionHandler);
 
         assertDoesNotThrow(() -> transactionService.createTransaction(transactionRequest, 1L, 1L));
+        verify(walletService, times(1)).doesUserBelongTo(1L, 1L);
         verify(walletService, times(1)).getWallet(1L);
-        verify(walletService, never()).getWallet(2L);
-        verify(transactionHandler, times(1)).process(transactionRequest, 1L);
-        verify(transactionRepository, times(1)).save(any(Transaction.class));
-        verify(transferRepository, never()).save(any(Transfer.class));
+        verify(transactionRepository, times(1)).save(transactionCaptor.capture());
+        verify(transactionHandler, times(1)).process(eq(transactionRequest), eq(1L), transactionCaptor.capture());
     }
 
     @Test
     void testCreateTransactionWithInvalidOriginWalletId() throws Exception {
-        when(walletService.getWallet(1L)).thenReturn(null);
+        transactionRequest.setRecipientWalletId(null);
+        when(walletService.doesUserBelongTo(1L, 1L)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 1L, 1L));
 
+        verify(walletService, times(1)).doesUserBelongTo(1L, 1L);
+        verify(walletService, never()).getWallet(1L);
         verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
         verify(transactionRepository, never()).save(any(Transaction.class));
         verify(transferRepository, never()).save(any(Transfer.class));
     }
 
-    @Test
-    void testCreateTransactionWithInvalidRecipientWalletId() throws Exception {
-        transactionRequest.setTransactionType(ETransactionType.TRANSFER);
-        when(walletService.getWallet(1L)).thenReturn(originWallet);
-        when(walletService.getWallet(2L)).thenReturn(null);
-
-        assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 1L, 1L));
-
-        verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
-        verify(transactionRepository, never()).save(any(Transaction.class));
-        verify(transferRepository, never()).save(any(Transfer.class));
-    }
-
-    @Test
-    void testCreateTransactionWithInvalidUser() throws Exception {
-        when(walletService.getWallet(1L)).thenReturn(originWallet);
-        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
-
-        assertThrows(IllegalArgumentException.class, () -> transactionService.createTransaction(transactionRequest, 2L, 1L));
-
-        verify(transactionHandlerRegistry, never()).getHandler(any(ETransactionType.class));
-        verify(transactionRepository, never()).save(any(Transaction.class));
-        verify(transferRepository, never()).save(any(Transfer.class));
-    }
 
     @Test
     void testCreateTransactionWithTransferSuccessfully() throws Exception {
         transactionRequest.setTransactionType(ETransactionType.TRANSFER);
+        when(walletService.doesUserBelongTo(1L, 1L)).thenReturn(true);
         when(walletService.getWallet(1L)).thenReturn(originWallet);
-        when(walletService.getWallet(2L)).thenReturn(recipientWallet);
-        when(transactionHandlerRegistry.getHandler(ETransactionType.TRANSFER)).thenReturn(transactionHandler);
+        when(transactionHandlerRegistry.getHandler(transactionRequest.getTransactionType())).thenReturn(transactionHandler);
 
         assertDoesNotThrow(() -> transactionService.createTransaction(transactionRequest, 1L, 1L));
-
-        verify(transactionHandler, times(1)).process(transactionRequest, 1L);
-        verify(transactionRepository, times(1)).save(any(Transaction.class));
-        verify(transferRepository, times(1)).save(any(Transfer.class));
+        verify(walletService, times(1)).doesUserBelongTo(1L, 1L);
+        verify(walletService, times(1)).getWallet(1L);
+        verify(transactionRepository, times(1)).save(transactionCaptor.capture());
+        verify(transactionHandler, times(1)).process(eq(transactionRequest), eq(1L), transactionCaptor.capture());
     }
 
     @Test
     void testCreateTransactionWithWithdrawSuccessfully() throws Exception {
         transactionRequest.setRecipientWalletId(null);
         transactionRequest.setTransactionType(ETransactionType.WITHDRAW);
+        when(walletService.doesUserBelongTo(1L, 1L)).thenReturn(true);
         when(walletService.getWallet(1L)).thenReturn(originWallet);
-        when(transactionHandlerRegistry.getHandler(ETransactionType.WITHDRAW)).thenReturn(transactionHandler);
+        when(transactionHandlerRegistry.getHandler(transactionRequest.getTransactionType())).thenReturn(transactionHandler);
 
         assertDoesNotThrow(() -> transactionService.createTransaction(transactionRequest, 1L, 1L));
-
+        verify(walletService, times(1)).doesUserBelongTo(1L, 1L);
         verify(walletService, times(1)).getWallet(1L);
-        verify(walletService, never()).getWallet(2L);
-        verify(transactionHandler, times(1)).process(transactionRequest, 1L);
-        verify(transactionRepository, times(1)).save(any(Transaction.class));
-        verify(transferRepository, never()).save(any(Transfer.class));
+        verify(transactionRepository, times(1)).save(transactionCaptor.capture());
+        verify(transactionHandler, times(1)).process(eq(transactionRequest), eq(1L), transactionCaptor.capture());
     }
 
 }

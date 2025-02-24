@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class WalletService {
 
@@ -17,9 +19,11 @@ public class WalletService {
     private WalletRepository walletRepository;
 
 
-//    public void createWallet() {
-//        System.out.println("Wallet created");
-//    }
+    public void createWallet(User user) {
+        Wallet wallet = new Wallet();
+        wallet.setUser(user);
+        walletRepository.save(wallet);
+    }
 public Wallet getWallet(Long walletId) throws Exception {
     return walletRepository.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet does not exist"));
 }
@@ -34,5 +38,9 @@ public Wallet getWallet(Long walletId) throws Exception {
         Wallet wallet = getWallet(originWalletId);
         wallet.subtractBalance(amount);
         walletRepository.save(wallet);
+    }
+    public boolean doesUserBelongTo(Long walletId, Long userId) throws Exception {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet does not exist"));
+        return Objects.equals(wallet.getUser().getId(), userId);
     }
 }

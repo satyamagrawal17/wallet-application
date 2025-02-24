@@ -2,6 +2,7 @@ package com.example.walletApplication.handler;
 
 import com.example.walletApplication.dto.TransactionRequest;
 import com.example.walletApplication.enums.ETransactionType;
+import com.example.walletApplication.model.transaction.Transaction;
 import com.example.walletApplication.repository.WalletRepository;
 import com.example.walletApplication.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,9 @@ public class DepositHandler implements ITransactionHandler{
 
 
     @Override
-    public void process(TransactionRequest request, Long originWalletId) throws Exception {
+    public void process(TransactionRequest request, Long originWalletId, Transaction savedTransaction) throws Exception {
         walletService.deposit(originWalletId, request.getAmount());
+
     }
 
     @Override
