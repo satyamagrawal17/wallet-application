@@ -1,6 +1,7 @@
 package com.example.walletApplication.model.transaction;
 
 import com.example.walletApplication.dto.TransactionRequest;
+import com.example.walletApplication.enums.ECurrency;
 import com.example.walletApplication.enums.ETransactionType;
 import com.example.walletApplication.model.Wallet;
 import jakarta.persistence.*;
@@ -33,6 +34,10 @@ public class Transaction {
     @Column(nullable = false)
     private double amount;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ECurrency currency;
+
 
     public Transaction(TransactionRequest transactionRequest, Wallet originWallet) {
         if(transactionRequest.getAmount() < 0) {
@@ -41,6 +46,7 @@ public class Transaction {
         this.originWallet = originWallet;
         this.transactionType = transactionRequest.getTransactionType();
         this.amount = transactionRequest.getAmount();
+        this.currency = transactionRequest.getCurrency();
 
     }
 }

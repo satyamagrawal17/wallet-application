@@ -16,25 +16,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 public class TransactionService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private TransferRepository transferRepository;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private WalletService walletService;
 
     @Autowired
     private TransactionHandlerRegistry transactionHandlerRegistry;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Transactional
     public void createTransaction(TransactionRequest transactionRequest, Long userId, Long originWalletId) throws Exception {
@@ -43,13 +39,18 @@ public class TransactionService {
         }
         Wallet savedOriginWallet = walletService.getWallet(originWalletId);
 
-        Transaction newTransaction = new Transaction(transactionRequest, savedOriginWallet);
-        Transaction savedTransaction = transactionRepository.save(newTransaction);
+
         ITransactionHandler handler = transactionHandlerRegistry.getHandler(transactionRequest.getTransactionType());
         if(Objects.isNull(handler)) {
             throw new IllegalArgumentException("Invalid transaction type");
         }
-        handler.process(transactionRequest, originWalletId, savedTransaction);
+        handler.process(transactionRequest, originWalletId);
 
     }
+
+//    public List<Transaction> fetchAllTransactions() {
+//        List<Transaction> transactionList = new ArrayList<>();
+//        List<Transaction> savedTransactions = transactionRepository.findAllById()
+//        return transactionList;
+//    }
 }

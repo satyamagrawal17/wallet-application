@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import com.example.walletApplication.enums.ECurrency;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -34,28 +35,29 @@ public class UserServiceTest {
 
     @Test
     void testRegister_success() {
-        UserDTO user = new UserDTO();
-        user.setUsername("testuser");
-        user.setPassword("password123");
+        UserDTO user = new UserDTO("testuser", "password123", ECurrency.USD);
+        User savedUser = new User();
+        savedUser.setUsername("testuser");
+        savedUser.setPassword("encodedPassword123");
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty()); // No existing user
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword123"); // Mock password encoding
+        when(userRepository.save(savedUser)).thenReturn(savedUser); // Mock save method
 
         userService.register(user);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture()); // Verify save was called
+        verify(walletService).createWallet(userCaptor.getValue(), ECurrency.USD); // Verify wallet creation
 
-        User savedUser = userCaptor.getValue();
-        assertEquals("testuser", savedUser.getUsername());
-        assertEquals("encodedPassword123", savedUser.getPassword()); // Check password hashed
+        User capturedUser = userCaptor.getValue();
+        assertEquals("testuser", capturedUser.getUsername());
+        assertEquals("encodedPassword123", capturedUser.getPassword()); // Check password hasheds
     }
 
     @Test
     void testRegister_existingUser() {
-        UserDTO user = new UserDTO();
-        user.setUsername("testuser");
-        user.setPassword("password123");
+        UserDTO user = new UserDTO("testuser", "password123", ECurrency.USD);
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(new User())); // Existing user
 
@@ -68,9 +70,7 @@ public class UserServiceTest {
 
     @Test
     void testLogin_success() {
-        UserDTO user = new UserDTO();
-        user.setUsername("testuser");
-        user.setPassword("password123");
+        UserDTO user = new UserDTO("testuser", "password123", ECurrency.USD);
 
         User existingUser = new User();
         existingUser.setUsername("testuser");
@@ -84,9 +84,7 @@ public class UserServiceTest {
 
     @Test
     void testLogin_failure() {
-        UserDTO user = new UserDTO();
-        user.setUsername("testuser");
-        user.setPassword("password123");
+        UserDTO user = new UserDTO("testuser", "password123", ECurrency.USD);
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty()); // No existing user
 

@@ -1,5 +1,6 @@
 package com.example.walletApplication.dto;
 
+import com.example.walletApplication.enums.ECurrency;
 import io.micrometer.common.lang.NonNull;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -20,4 +21,6 @@ public class UserDTO {
     @NotBlank(message = "Password is mandatory")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
+
+    private ECurrency currency;
 }

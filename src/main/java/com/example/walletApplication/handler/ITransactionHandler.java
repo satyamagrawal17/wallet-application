@@ -5,6 +5,6 @@ import com.example.walletApplication.enums.ETransactionType;
 import com.example.walletApplication.model.transaction.Transaction;
 
 public interface ITransactionHandler {
-    public void process(TransactionRequest request, Long originWalletId, Transaction savedTransaction) throws Exception;
+    public void process(TransactionRequest request, Long originWalletId) throws Exception;
     public ETransactionType getType();
 }

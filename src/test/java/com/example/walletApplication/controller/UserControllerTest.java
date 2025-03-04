@@ -1,6 +1,7 @@
 package com.example.walletApplication.controller;
 
 import com.example.walletApplication.dto.UserDTO;
+import com.example.walletApplication.enums.ECurrency;
 import com.example.walletApplication.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        user = new UserDTO("username", "password");
+        user = new UserDTO("username", "password", ECurrency.USD);
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.example.walletApplication.model;
 
+import com.example.walletApplication.dto.CurrencyExchangeRequestDto;
+import com.example.walletApplication.dto.MoneyDto;
 import com.example.walletApplication.enums.ECurrency;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -7,11 +9,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Objects;
 
 
 @Entity
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +29,8 @@ public class Wallet {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Wallet() {
-        this.balance = new Money(0, ECurrency.INR);
+    public Wallet(ECurrency currency) {
+        this.balance = new Money(0, Objects.requireNonNullElse(currency, ECurrency.INR));
     }
 
 

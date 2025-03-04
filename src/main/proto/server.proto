@@ -10,7 +10,7 @@ service CurrencyConversion {
 
 message CurrencyConversionRequest {
   Money money = 1;
-  string to_currency = 2;
+  string from_currency = 2;
 }
 
 message CurrencyConversionResponse {

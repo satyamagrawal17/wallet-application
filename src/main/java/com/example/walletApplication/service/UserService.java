@@ -35,7 +35,7 @@ public class UserService {
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User savedUser = userRepository.save(user);
-        walletService.createWallet(savedUser);
+        walletService.createWallet(savedUser, userDto.getCurrency());
     }
 
     public void login(UserDTO userDto) {
