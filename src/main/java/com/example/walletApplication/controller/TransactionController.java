@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users/{userId}/wallets/{walletId}/transactions")
@@ -31,15 +32,15 @@ public class TransactionController {
         }
     }
 
-//    @GetMapping
-//    public ResponseEntity<?> fetchAllTransactions() {
-//        try {
-//            const List<Transaction> transactionList = transactionService.fetchAllTransactions();
-//            return new ResponseEntity<>(transactionList, HttpStatus.OK);
-//        }
-//        catch (Exception e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//
-//        }
-//    }
+    @GetMapping
+    public ResponseEntity<?> fetchAllTransactions(@PathVariable Long userId, @PathVariable(name = "walletId") Long originWalletId) {
+        try {
+            List<Optional<Transaction>> transactionList = transactionService.fetchAllTransactions(userId, originWalletId);
+            return new ResponseEntity<>(transactionList, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
 }

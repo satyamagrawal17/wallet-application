@@ -9,6 +9,7 @@ import com.example.walletApplication.exception.WalletNotFoundException;
 import com.example.walletApplication.model.Money;
 import com.example.walletApplication.model.User;
 import com.example.walletApplication.model.Wallet;
+import com.example.walletApplication.repository.UserRepository;
 import com.example.walletApplication.repository.WalletRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,12 +26,16 @@ public class WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Autowired
     private CurrencyConversionService currencyConversionService;
 
 
-    public void createWallet(User user, ECurrency currency) {
+    public void createWallet(Long userId, ECurrency currency) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Wallet wallet = new Wallet(currency);
         wallet.setUser(user);
         walletRepository.save(wallet);

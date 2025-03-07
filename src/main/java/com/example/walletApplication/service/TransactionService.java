@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -31,6 +32,9 @@ public class TransactionService {
     private TransactionHandlerRegistry transactionHandlerRegistry;
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private TransferRepository transferRepository;
 
     @Transactional
     public void createTransaction(TransactionRequest transactionRequest, Long userId, Long originWalletId) throws Exception {
@@ -48,9 +52,17 @@ public class TransactionService {
 
     }
 
-//    public List<Transaction> fetchAllTransactions() {
-//        List<Transaction> transactionList = new ArrayList<>();
-//        List<Transaction> savedTransactions = transactionRepository.findAllById()
-//        return transactionList;
-//    }
+    public List<Optional<Transaction>> fetchAllTransactions(Long userId, Long originWalletId) throws Exception {
+        if(!walletService.doesUserBelongTo(originWalletId, userId)) {
+            throw new IllegalArgumentException("Wallet does not belong to user");
+        }
+        List<Optional<Transaction>> transactionList = new ArrayList<>();
+        List<Optional<Transaction>> savedTransactions = transactionRepository.findAllByOriginWallet_Id(originWalletId);
+        List<Optional<Transfer>> savedTransfers = transferRepository.findAllByToWallet_Id(originWalletId);
+        for(int i=0; i<savedTransfers.size(); i++) {
+            transactionList.add(transactionRepository.findById(savedTransfers.get(i).get().getId()));
+        }
+        transactionList.addAll(savedTransactions);
+        return transactionList;
+    }
 }

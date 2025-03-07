@@ -48,7 +48,7 @@ public class UserServiceTest {
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture()); // Verify save was called
-        verify(walletService).createWallet(userCaptor.getValue(), ECurrency.USD); // Verify wallet creation
+        verify(walletService).createWallet(userCaptor.getValue().getId(), ECurrency.USD); // Verify wallet creation
 
         User capturedUser = userCaptor.getValue();
         assertEquals("testuser", capturedUser.getUsername());
